@@ -1,18 +1,25 @@
-/* bunny.c - deliberately vulnerable demo program.
+/* bunny.c - deliberately vulnerable demo program (fixed).
  *
- * Prints a greeting for a name supplied on the command line.
- * Do not deploy this: the first version copies the argument into a fixed
- * stack buffer with no length check.
+ * Prints a greeting for a name supplied on the command line. The name is
+ * length-checked and copied with a bounded copy into a fixed stack buffer.
  */
 #include <stdio.h>
 #include <string.h>
 
-static void greet(const char *name)
-{
-    char buf[16];
+#define NAME_MAX 16
 
-    strcpy(buf, name);
+static int greet(const char *name)
+{
+    char buf[NAME_MAX];
+
+    if (strlen(name) >= sizeof(buf)) {
+        fprintf(stderr, "name too long (max %zu bytes)\n", sizeof(buf) - 1);
+        return 1;
+    }
+
+    snprintf(buf, sizeof(buf), "%s", name);
     printf("Hello, %s!\n", buf);
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -22,6 +29,5 @@ int main(int argc, char **argv)
         return 2;
     }
 
-    greet(argv[1]);
-    return 0;
+    return greet(argv[1]);
 }
