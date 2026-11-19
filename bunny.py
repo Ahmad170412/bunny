@@ -15,8 +15,10 @@ def resolve(name: str) -> Path:
     """Map a requested name onto a path inside the public share."""
     candidate = (ROOT / name).resolve()
     # Keep the share self-contained: refuse anything outside ROOT.
-    if not str(candidate).startswith(str(ROOT)):
-        raise PermissionError(f"outside the share: {name}")
+    try:
+        candidate.relative_to(ROOT)
+    except ValueError:
+        raise PermissionError(f"outside the share: {name}") from None
     return candidate
 
 
