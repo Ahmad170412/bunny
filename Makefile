@@ -1,8 +1,7 @@
-CC ?= cc
-CFLAGS ?= -O0 -fno-stack-protector
+.PHONY: run clean
 
-bunny: bunny.c
-	$(CC) $(CFLAGS) -o bunny bunny.c
+run:
+	python3 bunny.py welcome.txt
 
 clean:
-	rm -f bunny
+	rm -rf __pycache__
